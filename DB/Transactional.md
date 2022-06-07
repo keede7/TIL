@@ -92,3 +92,6 @@
 
 제공하는 잠금 기능을 사용하면 된다.
 
+---
+
+[자바 ORM 표준 JPA 프로그래밍](http://www.yes24.com/Product/Goods/19040233)
