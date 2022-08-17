@@ -35,37 +35,73 @@
 3. 버전 변화에 맞춰 재 작성해야 하며 이를 하지 않을 때 정확성이 낮다.
 
 ```java
-plugins {  (1)
+plugins {  
+	// Gradle 7.0 이상 버전부터 사용 가능
 	id "org.asciidoctor.jvm.convert" version "3.3.2"
 }
 
 configurations {
-	asciidoctorExt (2)
+	asciidoctorExt 
 }
 
 dependencies {
-(3)	asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor:{project-version}' 
+	asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor:{project-version}' 
 
 // MockMvc 대신에 WetTestClient 또는 Rest Assured 를 사용할 경우 
 // 다음 의존성을 추가하여 사용하면 된다
 //- `spring-restdocs-webtestclient`
 //- `spring-restdocs-restassured`
-(4)	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc:{project-version}' 
+	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc:{project-version}' 
 }
 
-ext { (5)
+ext { 
 	snippetsDir = file('build/generated-snippets')
 }
 
-test { (6)
+test { 
 	outputs.dir snippetsDir
 }
 
-asciidoctor { (7)
-	inputs.dir snippetsDir (8)
-	configurations 'asciidoctorExt' (9)
-	dependsOn test (10)
+asciidoctor { 
+	inputs.dir snippetsDir 
+	configurations 'asciidoctorExt' 
+	dependsOn test
+}
+
+bootJar { // SpringBoot 1.5 이하일 경우 jar
+    dependsOn asciidoctor
+    from ("${asciidoctor.outputDir}/html5") { // 운영환경 배포시에는 asciidoctor 태스크를 빼고
+        into 'static/docs' // 해당 경로로 복사
+    }
+}
+
+// 문서 수정 후 반영안될 경우 제거 후 생성되게 한다.
+asciidoctor.doFirst {
+    delete file('src/main/resources/static/docs')
+}
+
+task copyDocument(type: Copy) {
+    dependsOn asciidoctor
+
+    from file("build/docs/asciidoc")
+    into file("src/main/resources/static/docs")
+}
+
+build {
+    dependsOn copyDocument
 }
 ```
+
+추가 설정으로 `src/docs/asciidoc` 경로로 `*.adoc` 파일을 생성해둬야 한다. 
+
+이후 `./gradlew build` 를 하면 `build/docs/asciidoc/*.html` 경로로 `*.adoc` 파일이 변환된다.
+
+**( 해당 경로(`src/docs/asciidoc`)로 디렉토리를 정확하게 만들지 않으면  `build/docs/asciidoc/*.html` 가 생성되지 않는다. )**
+
+추가 과정에서 `copyDocument` 에 의해 `build/docs/asciidoc` 경로의 `*.html` 파일을
+
+`src/main/resources/static/docs` 경로로 복사할 수 있게 된다.
+
+추후 문서 변경이후에 반영되지 않는 점을 고려해서 `asciidoctor.doFirst` Task를 선언한다.
 
 공식문서 : [https://docs.spring.io/spring-restdocs/docs/current/reference/html5/#getting-started-build-configuration](https://docs.spring.io/spring-restdocs/docs/current/reference/html5/#getting-started-build-configuration)
