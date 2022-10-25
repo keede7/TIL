@@ -63,7 +63,6 @@
 
 `예비 요청` 은 다른 서버에 출처요청 했을 때, 진행 할 수 있는지 없는지 여부를 판단하는 작업이라고 생각하면 될 것 같다.
 
-
-
+![resolve](https://github.com/awse2050/TIL/blob/main/HTTP/CORS-Resolve.PNG)
 
 
