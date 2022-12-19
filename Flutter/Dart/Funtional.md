@@ -134,3 +134,87 @@ numbers.fold<int>(0, (prev,next) => prev+next);
 `reduce`의 경우 초기값 자체가 `prev` 가 되어서 초기값을 선언하기 어려웠지만 `fold` 의 경우 초기값을 미리 설정해둘수 있다.
 
 2개의 파라미터로 받지만 최초에는 초기값과 `next` 값 (첫번쨰 인덱스값[1])으로 계산을 먼저 진행하게 된다.
+
+
+### Cascading Operator
+
+여러 배열을 뿌려주는 역할을 한다.
+
+`JS`에서 `spread`과 비슷하다.
+
+```jsx
+
+List<int> even = [
+2,4,6,8];
+
+List<int> odd = [ 1,3,5,7];
+
+print([even,odd]); // [[2,4,6,8], [1,3,5,7]];
+print( [...even, ...odd ] ); // [2,4,6,8,1,3,5,7]
+// [...even] 또한 새로운 배열로 생성된다.
+print(even == [...even]) // false
+```
+
+### 실제 상황에서의 예시
+
+
+```dart
+void main() {
+
+  // 더미 리스트 생성
+  List<Map<String, String>> idols = [
+    {
+      "name": "하이",
+      "group": "HI",
+    },
+    {
+      "name":"헬로우",
+      "group":"HI",
+    },
+    {
+      "name":"바이",
+      "group":"BYE",
+    },
+    {
+      "name":"잘가",
+      "group":"BYE",
+    }    
+  ];
+  
+  print(' idols : $idols');
+  
+  final List<Person> persons = idols.map( (idol) => Person(
+    // ! 를 쓰는 이유는 해당 Map에 키값이 있을지 없을지 모르기 떄문에
+    // 확정적으로 있다고 가정을 시켜주기 위해서 사용한다.
+    name: idol['name']!,
+    group: idol['group']!,
+  )) // 그룹이 HI인 사람들만 가져온다.
+  .where( (person) => person.group == 'HI')
+    .toList();
+  
+  print('persons : $persons');
+  
+  for( Person person in persons) {
+    print('person : $person');
+  }
+  
+}
+
+class Person {
+  
+  final String name;
+  final String group;
+  
+  Person({
+    required this.name,
+    required this.group,
+  });
+  
+  @override
+  String toString() {
+    return '그룹명은 $group 이고, 이름은 $name 입니다.';
+  }
+  
+}
+```
+
