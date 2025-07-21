@@ -1,5 +1,7 @@
-### TIL
+## TIL
 
-하루 공부했던 것들을 이해하면서 정리하는 수준, 
+---
 
-크게 의미는 없음
+### Database
+
+1) [Sharding](https://techblog.woowahan.com/2687/)
